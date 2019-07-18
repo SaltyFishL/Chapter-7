@@ -1,20 +1,19 @@
 package com.bytedance.videoplayer;
 
-import android.content.SharedPreferences;
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PersistableBundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private VideoView mVideoView;
     private SeekBar mSeekBar;
@@ -47,11 +46,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.activity_main);
+
+
         if (savedInstanceState != null) {
             mProgress = savedInstanceState.getInt(VIDEO_PROGRESS);
             Log.d(TAG, "onCreate: mProgress = " + mProgress);
         }
-        setContentView(R.layout.activity_main);
+
 
         mTvTotalTime = findViewById(R.id.text_view_total_time);
         mTvCurrentTime = findViewById(R.id.text_view_current_time);
@@ -121,6 +123,38 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop: ");
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: ");
+
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        //横屏
+        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            //Remove title bar
+//            this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            //Remove notification bar
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            Log.d(TAG, "onConfigurationChanged: 横屏");
+        } else {
+            WindowManager.LayoutParams attr = MainActivity.this.getWindow().getAttributes();
+            attr.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            MainActivity.this.getWindow().setAttributes(attr);
+            Log.d(TAG, "onConfigurationChanged: 竖屏");
+
+        }
+    }
 
     @Override
     protected void onDestroy() {
